@@ -22,11 +22,14 @@ const Register = () => {
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.on(
+        'state_changed',
+        (snapshot) => {},
         (err) => {
           console.log(err);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            console.log(downloadURL);
             await updateProfile(res.user, { photoURL: downloadURL });
 
             await setDoc(doc(db, 'users', res.user.uid), {
