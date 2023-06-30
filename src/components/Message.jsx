@@ -1,10 +1,8 @@
-const Message = ({ own }) => {
+const Message = ({ own, mgs }) => {
   return (
     <div className={`message ${own && 'own'}`}>
-      <p>
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nobis Lorem
-      </p>
-      <img src="https://loremflickr.com/g/320/240/paris" alt="photo" />
+      <p>{mgs.text}</p>
+      {mgs.img && <img src={mgs.img} alt="photo" />}
       <span className="egde"></span>
     </div>
   );
