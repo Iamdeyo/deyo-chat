@@ -20,7 +20,6 @@ const Search = () => {
 
   const handleSearch = async (e) => {
     if (e.key === 'Enter') {
-      console.log('first');
       try {
         const q = query(
           collection(db, 'users'),
@@ -43,8 +42,6 @@ const Search = () => {
       currentUser.uid > user.uid
         ? currentUser.uid + user.uid
         : user.uid + currentUser.uid;
-
-    console.log(combinedId);
     try {
       const res = await getDoc(doc(db, 'chats', combinedId));
       if (!res.exists()) {
@@ -70,6 +67,7 @@ const Search = () => {
           [combinedId + '.date']: serverTimestamp(),
         });
       }
+      setUsers([]);
     } catch (err) {
       console.log(err);
     }

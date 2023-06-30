@@ -1,9 +1,12 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
+import { getErrorMessage } from '../utils/errorHandles';
+import { useState } from 'react';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [errorMessage, setErrrorMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +18,8 @@ const Login = () => {
       const res = await signInWithEmailAndPassword(auth, email, password);
       navigate('/');
     } catch (err) {
-      console.log(err);
+      const errorCode = err.code;
+      setErrrorMessage(getErrorMessage(errorCode));
     }
   };
   return (
@@ -28,8 +32,12 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <input type="email" placeholder="Email" />
             <input type="password" placeholder="Password" />
+            <span className="error"> {errorMessage}</span>
             <button>Login</button>
           </form>
+          <div className="link">
+            Don't have an account yet ? <Link to={'/register'}>Sign Up</Link>
+          </div>
         </div>
       </div>
     </>

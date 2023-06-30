@@ -23,6 +23,10 @@
   margin: 0;
   padding: 0;
 }
+a {
+  text-decoration: none;
+  color: inherit;
+}
 
 input,
 button {
@@ -53,6 +57,23 @@ body {
     width: 100%;
     max-width: 400px;
     padding: 40px 24px 30px;
+    .error {
+      color: red;
+      font-size: 0.75em;
+      font-style: italic;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .link {
+      margin-top: 20px;
+      font-size: 0.9em;
+      a {
+        &:hover {
+          color: #628eff;
+          text-decoration: underline;
+        }
+      }
+    }
 
     .logo {
       font-size: 2em;
