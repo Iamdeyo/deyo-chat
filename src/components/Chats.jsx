@@ -10,17 +10,18 @@ import { AuthContext } from '../context/AuthContext';
 const Chats = () => {
   const { data } = useContext(ChatContext);
   const { currentUser } = useContext(AuthContext);
-  const [message, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'chats', data.chatId), (doc) => {
       doc.exists() && setMessages(doc.data().message);
     });
+
     return () => {
       unsub();
     };
   }, [data.chatId]);
-
+  console.log(messages);
   return (
     <div className="chats">
       <div className="chatTop">
@@ -33,8 +34,8 @@ const Chats = () => {
         </div>
       </div>
       <div className="mgsContainer">
-        {message.length > 0 &&
-          message?.map((mgs) => (
+        {messages.length > 0 &&
+          messages?.map((mgs) => (
             <Message
               own={currentUser.uid === mgs.senderId}
               key={mgs.id}

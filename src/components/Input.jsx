@@ -8,6 +8,7 @@ import {
   arrayUnion,
   Timestamp,
   serverTimestamp,
+  increment,
 } from 'firebase/firestore';
 import { db, storage } from '../firebase';
 import { v4 as uuid } from 'uuid';
@@ -78,6 +79,7 @@ const Input = () => {
         [data.chatId + '.lastMessage']: {
           text,
         },
+        [data.chatId + '.unreadMgsCount']: increment(1),
         [data.chatId + '.date']: serverTimestamp(),
       });
       setText('');
