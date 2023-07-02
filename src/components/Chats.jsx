@@ -14,7 +14,8 @@ const Chats = () => {
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'chats', data.chatId), (doc) => {
-      doc.exists() && setMessages(doc.data().message);
+      doc.exists() &&
+        setMessages(doc.data().message.sort((a, b) => b.date - a.date));
     });
 
     return () => {

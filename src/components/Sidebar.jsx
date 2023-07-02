@@ -3,7 +3,7 @@ import { db } from '../firebase';
 import Navbar from './Navbar';
 import Search from './Search';
 import UserChats from './UserChats';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 

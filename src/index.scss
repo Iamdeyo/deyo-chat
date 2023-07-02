@@ -1,14 +1,14 @@
-// :root {
-//   --main-bg: #f8f8f8;
-//   --com-bg: #fff;
-//   --text: #191d1e;
-//   --col: #628eff65;
-//   --mgs1: #191d1e;
-//   --mgs2: #fff;
-//   --mgsText: #fff;
-// }
-// .dark
 :root {
+  --main-bg: #f1f1f1;
+  --com-bg: #fbfbfb;
+  --text: #191d1e;
+  --col: #628eff65;
+  --mgs1: #191d1e;
+  --mgs2: #fbfbfb;
+  --mgsText: #fff;
+  --chatBoxShadow: 0px 6px 10px 0px rgba(101, 101, 101, 0.25);
+}
+.dark:root {
   --main-bg: #161819;
   --com-bg: #181a1c;
   --text: #fff;
@@ -16,6 +16,7 @@
   --mgs1: #181a1c;
   --mgs2: #1c1e1f;
   --mgsText: #fff;
+  --chatBoxShadow: 0px 4px 20px -5.717092990875244px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -151,7 +152,8 @@ body {
   max-width: 400px;
   min-width: 400px;
   background: var(--com-bg);
-  box-shadow: 0px 4px 20px -5.717092990875244px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--chatBoxShadow);
+  z-index: 10;
   .navBar {
     background-color: var(--col);
     padding: 14px 16px;
@@ -311,10 +313,11 @@ body {
   }
   .mgsContainer {
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     // justify-content: end;
     width: 100%;
-    height: fit-content;
+    height: 100%;
+
     max-height: 100vh;
     overflow: hidden;
     overflow-y: scroll;
@@ -328,7 +331,8 @@ body {
       padding: 24px 32px;
       background-color: var(--mgs1);
       color: var(--mgsText);
-      box-shadow: 0px 4px 20px -5.717092990875244px rgba(0, 0, 0, 0.15);
+      // box-shadow: 0px 4px 20px -5.717092990875244px rgba(0, 0, 0, 0.15);
+      box-shadow: var(--chatBoxShadow);
       border-radius: 20px;
       width: fit-content;
       max-width: 406px;
