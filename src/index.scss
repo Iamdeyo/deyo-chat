@@ -327,6 +327,7 @@ body {
     }
 
     .message {
+      scroll-behavior: smooth;
       margin: 0 48px;
       padding: 24px 32px;
       background-color: var(--mgs1);

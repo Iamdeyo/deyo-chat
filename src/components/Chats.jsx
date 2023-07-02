@@ -3,26 +3,44 @@ import Input from './Input';
 import Message from './Message';
 import { useContext, useEffect, useState } from 'react';
 import { ChatContext } from '../context/ChatContext';
-import { doc, onSnapshot } from 'firebase/firestore';
+import {
+  collection,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+} from 'firebase/firestore';
 import { db } from '../firebase';
 import { AuthContext } from '../context/AuthContext';
 
 const Chats = () => {
   const { data } = useContext(ChatContext);
   const { currentUser } = useContext(AuthContext);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'chats', data.chatId), (doc) => {
-      doc.exists() &&
-        setMessages(doc.data().message.sort((a, b) => b.date - a.date));
+    const chatRef = collection(db, 'chats', data.chatId, 'messages');
+    const chatQuery = query(chatRef, orderBy('date', 'desc'), limit(pageSize));
+    const unsub = onSnapshot(chatQuery, (doc) => {
+      setMessages(doc.docs);
     });
 
     return () => {
       unsub();
     };
-  }, [data.chatId]);
-  console.log(messages);
+  }, [data.chatId, pageSize]);
+
+  const handleReactEnd = () => {
+    if (messages.length >= pageSize) {
+      setPageSize((prev) => (prev = prev + 10));
+    }
+  };
+
+  // useEffect(() => {
+  //   setPageSize(10);
+  // }, [data.chatId]);
   return (
     <div className="chats">
       <div className="chatTop">
@@ -34,16 +52,33 @@ const Chats = () => {
           <FiMoreHorizontal />
         </div>
       </div>
-      <div className="mgsContainer">
-        {messages.length > 0 &&
+
+      <div
+        className="mgsContainer"
+        onScroll={(e) => {
+          if (
+            e.currentTarget.scrollHeight ===
+            window.innerHeight - e.currentTarget.scrollTop
+          ) {
+            handleReactEnd();
+          }
+        }}
+        onClick={(e) => {
+          // console.log(messages.length);
+          // console.log(pageSize);
+          ref.current.scrollIntoView();
+        }}
+      >
+        {messages &&
           messages?.map((mgs) => (
             <Message
-              own={currentUser.uid === mgs.senderId}
+              own={currentUser.uid === mgs.data().senderId}
               key={mgs.id}
-              mgs={mgs}
+              mgs={mgs.data()}
             />
           ))}
       </div>
+
       <Input />
     </div>
   );

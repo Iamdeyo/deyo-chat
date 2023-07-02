@@ -5,10 +5,10 @@ import { ChatContext } from '../context/ChatContext';
 import {
   doc,
   updateDoc,
-  arrayUnion,
   Timestamp,
   serverTimestamp,
   increment,
+  setDoc,
 } from 'firebase/firestore';
 import { db, storage } from '../firebase';
 import { v4 as uuid } from 'uuid';
@@ -24,6 +24,9 @@ const Input = () => {
 
   const handleSendMgs = async (e) => {
     e.preventDefault();
+    const uid = uuid();
+    const chatRef = doc(db, 'chats', data.chatId, 'messages', uid);
+
     try {
       if (img) {
         const storageRef = ref(storage, uuid());
@@ -39,32 +42,24 @@ const Input = () => {
           () => {
             getDownloadURL(uploadTask.snapshot.ref).then(
               async (downloadURL) => {
-                console.log(downloadURL);
-                const chatRef = doc(db, 'chats', data.chatId);
-
-                await updateDoc(chatRef, {
-                  message: arrayUnion({
-                    id: uuid(),
-                    senderId: currentUser.uid,
-                    text: text,
-                    img: downloadURL,
-                    date: Timestamp.now(),
-                  }),
+                await setDoc(chatRef, {
+                  uid,
+                  senderId: currentUser.uid,
+                  text: text,
+                  img: downloadURL,
+                  date: Timestamp.now(),
                 });
               }
             );
           }
         );
       } else {
-        const chatRef = doc(db, 'chats', data.chatId);
-        await updateDoc(chatRef, {
-          message: arrayUnion({
-            id: uuid(),
-            senderId: currentUser.uid,
-            text: text,
-            img: img,
-            date: Timestamp.now(),
-          }),
+        await setDoc(chatRef, {
+          uid,
+          senderId: currentUser.uid,
+          text: text,
+          img: img,
+          date: Timestamp.now(),
         });
       }
       // add to user chats

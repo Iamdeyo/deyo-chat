@@ -13,6 +13,7 @@ import {
 import { db } from '../firebase';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { ChatContext } from '../context/ChatContext';
 
 const Search = () => {
   const [users, setUsers] = useState([]);
@@ -36,6 +37,7 @@ const Search = () => {
   };
 
   const { currentUser } = useContext(AuthContext);
+  const { dispatch } = useContext(ChatContext);
   const handleCreateUserChats = async (user) => {
     // check if chats is already existing
     const combinedId =
@@ -46,7 +48,7 @@ const Search = () => {
       const res = await getDoc(doc(db, 'chats', combinedId));
       if (!res.exists()) {
         // create new chat
-        await setDoc(doc(db, 'chats', combinedId), { message: [] });
+        await setDoc(doc(db, 'chats', combinedId), {});
 
         // add to user chats
         await updateDoc(doc(db, 'userChats', currentUser.uid), {
@@ -68,6 +70,8 @@ const Search = () => {
         });
       }
       setUsers([]);
+      setUsername('');
+      dispatch({ type: 'CHANGE_USER', payload: user });
     } catch (err) {
       console.log(err);
     }
