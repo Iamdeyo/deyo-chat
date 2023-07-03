@@ -6,6 +6,7 @@ import UserChats from './UserChats';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
+import BottomNav from './BottomNav';
 
 const Sidebar = () => {
   const { currentUser } = useContext(AuthContext);
@@ -34,22 +35,25 @@ const Sidebar = () => {
     <div className="sideBar">
       <Navbar />
       <Search />
-      {chats &&
-        Object.entries(chats)
-          ?.sort((a, b) => b[1].date - a[1].date)
-          .map((chat) => (
-            <div
-              key={chat[0]}
-              onClick={() => handleSelectChat(chat[1].userInfo)}
-            >
-              <UserChats
-                user={chat[1].userInfo}
-                lastMgs={chat[1].lastMessage}
-                date={chat[1].date}
-                unread={chat[1].unreadMgsCount}
-              />
-            </div>
-          ))}
+      <div className="userChatContainer">
+        {chats &&
+          Object.entries(chats)
+            ?.sort((a, b) => b[1].date - a[1].date)
+            .map((chat) => (
+              <div
+                key={chat[0]}
+                onClick={() => handleSelectChat(chat[1].userInfo)}
+              >
+                <UserChats
+                  user={chat[1].userInfo}
+                  lastMgs={chat[1].lastMessage}
+                  date={chat[1].date}
+                  unread={chat[1].unreadMgsCount}
+                />
+              </div>
+            ))}
+      </div>
+      <BottomNav />
     </div>
   );
 };

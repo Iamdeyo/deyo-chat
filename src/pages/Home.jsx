@@ -7,7 +7,7 @@ const Home = () => {
   const { data } = useContext(ChatContext);
   return (
     <>
-      <div className="mainContainer">
+      <div className={`mainContainer ${!data.chatId && 'noChat'}`}>
         <Sidebar />
 
         {data.chatId ? (

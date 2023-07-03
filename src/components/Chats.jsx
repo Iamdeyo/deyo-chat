@@ -1,4 +1,9 @@
-import { FiMoreHorizontal, FiUserPlus, FiVideo } from 'react-icons/fi';
+import {
+  FiChevronLeft,
+  FiMoreHorizontal,
+  FiUserPlus,
+  FiVideo,
+} from 'react-icons/fi';
 import Input from './Input';
 import Message from './Message';
 import { useContext, useEffect, useState } from 'react';
@@ -14,7 +19,7 @@ import { db } from '../firebase';
 import { AuthContext } from '../context/AuthContext';
 
 const Chats = () => {
-  const { data } = useContext(ChatContext);
+  const { data, dispatch } = useContext(ChatContext);
   const { currentUser } = useContext(AuthContext);
   const [messages, setMessages] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -41,9 +46,15 @@ const Chats = () => {
   // useEffect(() => {
   //   setPageSize(10);
   // }, [data.chatId]);
+  const handleGoBack = () => {
+    dispatch({ type: 'REMOVE_USER' });
+  };
   return (
     <div className="chats">
       <div className="chatTop">
+        <div className="back" onClick={handleGoBack}>
+          <FiChevronLeft size={24} />
+        </div>
         <img src={data?.user?.photoURL} alt="friend-dp" />
         <span className="username">{data?.user?.displayName}</span>
         <div className="icons">

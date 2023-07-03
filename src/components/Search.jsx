@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useContext, useState } from 'react';
+import { FiSearch } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 
@@ -20,19 +21,22 @@ const Search = () => {
   const [username, setUsername] = useState('');
 
   const handleSearch = async (e) => {
-    if (e.key === 'Enter') {
-      try {
-        const q = query(
-          collection(db, 'users'),
-          where('displayName', '==', username)
-        );
+    try {
+      const q = query(
+        collection(db, 'users'),
+        where('displayName', '==', username)
+      );
 
-        const querySnapshot = await getDocs(q);
-        // console.log(querySnapshot.docs);
-        setUsers(querySnapshot.docs);
-      } catch (err) {
-        console.log(err);
-      }
+      const querySnapshot = await getDocs(q);
+      // console.log(querySnapshot.docs);
+      setUsers(querySnapshot.docs);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleEnterKey = async (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -77,17 +81,20 @@ const Search = () => {
     }
   };
   return (
-    <div className="search">
+    <div className={`search  + ${username.length > 0 && 'searchResults'}`}>
       <div className="searchForm">
         <input
           type="text"
           placeholder="Find a user"
-          onKeyDown={handleSearch}
+          onKeyDown={handleEnterKey}
           onChange={(e) => setUsername(e.target.value)}
           value={username}
         />
+        <span className="searchBtn" onClick={handleSearch}>
+          <FiSearch />
+        </span>
       </div>
-      <div>
+      <div className="userChatContainer">
         {users.length > 0 &&
           users.map((user) => (
             <div
