@@ -2,60 +2,122 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, storage, db } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { doc, setDoc } from 'firebase/firestore';
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useContext, useState } from 'react';
 import { getErrorMessage } from '../utils/errorHandles';
+import PhImg from '../assets/regDef.svg';
+import { FiLoader } from 'react-icons/fi';
+import { AuthContext } from '../context/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
-  const [errorMessage, setErrrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [error, setError] = useState('');
   const [displayPhoto, setDisplayPhoto] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [file, setFiles] = useState(null);
+
+  const { currentUser } = useContext(AuthContext);
+
+  if (currentUser) {
+    return <Navigate to="/" replace={true} />;
+  }
 
   const handleDisplayingPhoto = (e) => {
-    setDisplayPhoto(URL.createObjectURL(e.target.files[0]));
+    if (e.target.files[0]) {
+      setFiles(e.target.files[0]);
+      setDisplayPhoto(URL.createObjectURL(e.target.files[0]));
+    } else {
+      setFiles(null);
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate email
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Invalid email address';
+    }
+
+    // Validate username
+    if (!displayName) {
+      newErrors.displayName = 'Username is required';
+    }
+
+    // Validate password
+    if (!password) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long';
+    }
+
+    setError(newErrors);
+
+    // Return true if there are no errors, false otherwise
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const displayName = e.target[0].value;
-    const email = e.target[1].value;
-    const password = e.target[2].value;
-    const file = e.target[3].files[0];
+    setIsLoading(true);
 
-    try {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
+    if (validateForm()) {
+      try {
+        const res = await createUserWithEmailAndPassword(auth, email, password);
 
-      await updateProfile(res.user, { displayName });
-      const storageRef = ref(storage, displayName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+        await updateProfile(res.user, { displayName });
+        const storageRef = ref(storage, displayName);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        let photoURL = null;
+        if (file) {
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {},
+            (err) => {
+              const errorCode = err.code;
+              setErrorMessage(getErrorMessage(errorCode));
+            },
+            () => {
+              getDownloadURL(uploadTask.snapshot.ref).then(
+                async (downloadURL) => {
+                  photoURL = await updateProfile(res.user, { photoURL });
 
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {},
-        (err) => {
-          const errorCode = err.code;
-          setErrrorMessage(getErrorMessage(errorCode));
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await updateProfile(res.user, { photoURL: downloadURL });
+                  await setDoc(doc(db, 'users', res.user.uid), {
+                    uid: res.user.uid,
+                    email,
+                    displayName,
+                    photoURL: downloadURL,
+                  });
+                }
+              );
+            }
+          );
+        } else {
+          await updateProfile(res.user, { photoURL });
 
-            await setDoc(doc(db, 'users', res.user.uid), {
-              uid: res.user.uid,
-              email,
-              displayName,
-              photoURL: downloadURL,
-            });
-            await setDoc(doc(db, 'userChats', res.user.uid), {});
-
-            navigate('/');
+          await setDoc(doc(db, 'users', res.user.uid), {
+            uid: res.user.uid,
+            email,
+            displayName,
+            photoURL: null,
           });
         }
-      );
-    } catch (err) {
-      const errorCode = err.code;
-      setErrrorMessage(getErrorMessage(errorCode));
+        await setDoc(doc(db, 'userChats', res.user.uid), {});
+
+        setIsLoading(false);
+      } catch (err) {
+        const errorCode = err.code;
+        setErrorMessage(getErrorMessage(errorCode));
+        setIsLoading(false);
+      }
     }
+    setIsLoading(false);
   };
 
   return (
@@ -66,9 +128,27 @@ const Register = () => {
           <span className="title"> Register </span>
           <span className="desc"> Just some details to get you in.! </span>
           <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Username" />
-            <input type="text" placeholder="email" />
-            <input type="password" placeholder="Password" />
+            <span className="inputError"> {error.displayName} </span>
+            <input
+              type="text"
+              placeholder="Username"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
+            <span className="inputError"> {error.email} </span>
+            <input
+              type="text"
+              placeholder="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <span className="inputError"> {error.password} </span>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
             <input
               style={{ display: 'none' }}
               type="file"
@@ -77,17 +157,16 @@ const Register = () => {
             />
             <label htmlFor="file">
               {!displayPhoto ? (
-                <img
-                  src="https://loremflickr.com/g/320/240/paris"
-                  alt="avater"
-                />
+                <img src={PhImg} alt="avater" />
               ) : (
                 <img src={displayPhoto} alt="avater" />
               )}
               <span>Add an avatar</span>
             </label>
             <span className="error"> {errorMessage} </span>
-            <button>Register</button>
+            <button disabled={isLoading}>
+              Register {isLoading && <FiLoader className="btnLoader" />}{' '}
+            </button>
           </form>
           <div className="link">
             Already have an account ? <Link to={'/login'}>Sign In</Link>

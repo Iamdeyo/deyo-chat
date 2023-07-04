@@ -1,5 +1,5 @@
-import { useContext, useState } from 'react';
-import { FiSend } from 'react-icons/fi';
+import { useContext, useEffect, useState } from 'react';
+import { FiSend, FiX } from 'react-icons/fi';
 import { MdOutlineAddPhotoAlternate, MdAttachFile } from 'react-icons/md';
 import { ChatContext } from '../context/ChatContext';
 import {
@@ -21,9 +21,21 @@ const Input = () => {
   const { currentUser } = useContext(AuthContext);
   const [text, setText] = useState('');
   const [img, setImg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleImgUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setImg(file);
+    } else {
+      alert('Please select an image');
+    }
+  };
 
   const handleSendMgs = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const uid = uuid();
     const chatRef = doc(db, 'chats', data.chatId, 'messages', uid);
 
@@ -36,7 +48,7 @@ const Input = () => {
           (snapshot) => {},
           (err) => {
             const errorCode = err.code;
-            // setErrrorMessage(getErrorMessage(errorCode));
+            // setErrorMessage(getErrorMessage(errorCode));
             console.log(errorCode);
           },
           () => {
@@ -77,14 +89,43 @@ const Input = () => {
         [data.chatId + '.unreadMgsCount']: increment(1),
         [data.chatId + '.date']: serverTimestamp(),
       });
+      setIsLoading(false);
       setText('');
       setImg(null);
     } catch (err) {
       console.log(err);
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setText('');
+    setImg(null);
+  }, [data.chatId]);
   return (
     <div className="inputContainer">
+      {img && (
+        <div className="imageContainer">
+          <span className="removeImg" onClick={() => setImg(null)}>
+            <FiX />
+          </span>
+          <div className="imagePreview">
+            <img src={URL.createObjectURL(img)} alt="Photo-Message" />
+            <form onSubmit={handleSendMgs}>
+              <input
+                type="text"
+                placeholder="Text something..."
+                onChange={(e) => setText(e.target.value)}
+                value={text}
+              />
+
+              <button disabled={isLoading} className="inputIcon">
+                <FiSend size={20} />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
       <form onSubmit={handleSendMgs}>
         <input
           type="text"
@@ -96,7 +137,7 @@ const Input = () => {
           style={{ display: 'none' }}
           type="file"
           id="file"
-          onChange={(e) => setImg(e.target.files[0])}
+          onChange={handleImgUpload}
         />
         <span className="inputIcon">
           <MdAttachFile size={20} />
@@ -104,7 +145,7 @@ const Input = () => {
         <label htmlFor="file" className="inputIcon">
           <MdOutlineAddPhotoAlternate size={20} />
         </label>
-        <button className="inputIcon">
+        <button disabled={isLoading || text.length == 0} className="inputIcon">
           <FiSend size={20} />
         </button>
       </form>

@@ -4,6 +4,8 @@ import { ChatContext } from '../context/ChatContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { formatMessageTime } from '../utils/TimeFormatHandler';
+import DefImg from '../assets/def.jpg';
+import { FiCamera } from 'react-icons/fi';
 
 const UserChats = ({ user, date, lastMgs, unread }) => {
   const { currentUser } = useContext(AuthContext);
@@ -30,10 +32,19 @@ const UserChats = ({ user, date, lastMgs, unread }) => {
   }, [lastMgs, currentChatId]);
   return (
     <div className="userChats">
-      <img src={user?.photoURL} alt="user-dp" />
+      <img src={user?.photoURL ? user.photoURL : DefImg} alt="user-dp" />
       <div className="info">
         <span className="username">{user?.displayName}</span>
-        <span className="lastMgs">{lastMgs?.text}</span>
+        <span className="lastMgs">
+          {lastMgs?.text < 1 ? (
+            <span>
+              {' '}
+              Photo <FiCamera />{' '}
+            </span>
+          ) : (
+            lastMgs?.text
+          )}
+        </span>
       </div>
 
       <span className="dateTime">{formatMessageTime(date)}</span>

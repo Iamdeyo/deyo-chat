@@ -20,8 +20,6 @@ const Navbar = () => {
 
   const systemMode = () => {
     if (themeMode === 'system') {
-      console.log(themeMode);
-
       const systemMode = prefersDarkMode.matches ? 'dark' : 'light';
       document.documentElement.setAttribute('class', systemMode);
     }

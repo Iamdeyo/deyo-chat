@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AuthContext } from '../context/AuthContext';
+import DefImg from '../assets/def.jpg';
 
 const Chats = () => {
   const { data, dispatch } = useContext(ChatContext);
@@ -55,7 +56,10 @@ const Chats = () => {
         <div className="back" onClick={handleGoBack}>
           <FiChevronLeft size={24} />
         </div>
-        <img src={data?.user?.photoURL} alt="friend-dp" />
+        <img
+          src={data?.user?.photoURL ? data.user.photoURL : DefImg}
+          alt="friend-dp"
+        />
         <span className="username">{data?.user?.displayName}</span>
         <div className="icons">
           <FiVideo />
