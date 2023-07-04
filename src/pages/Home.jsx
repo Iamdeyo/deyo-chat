@@ -9,7 +9,6 @@ const Home = () => {
     <>
       <div className={`mainContainer ${!data.chatId && 'noChat'}`}>
         <Sidebar />
-
         {data.chatId ? (
           <Chats />
         ) : (

@@ -1,13 +1,13 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { getErrorMessage } from '../utils/errorHandles';
 import { useContext, useState } from 'react';
 import { FiLoader } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
+import Logo from '../assets/logo.svg';
 
 const Login = () => {
-  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,7 +61,10 @@ const Login = () => {
     <>
       <div className="formContainer">
         <div className="formWrapper">
-          <span className="logo"> Deyo Chat</span>
+          <span className="logo">
+            {' '}
+            <img src={Logo} alt="logo" width={30} height={30} /> Deyo Chat
+          </span>
           <span className="title"> Login </span>
           <span className="desc"> Glad you're back! </span>
           <form onSubmit={handleSubmit}>

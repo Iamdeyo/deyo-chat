@@ -8,6 +8,7 @@ import { getErrorMessage } from '../utils/errorHandles';
 import PhImg from '../assets/regDef.svg';
 import { FiLoader } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
+import Logo from '../assets/logo.svg';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -124,7 +125,10 @@ const Register = () => {
     <>
       <div className="formContainer">
         <div className="formWrapper">
-          <span className="logo"> Deyo Chat</span>
+          <span className="logo">
+            {' '}
+            <img src={Logo} alt="logo" width={30} height={30} /> Deyo Chat
+          </span>
           <span className="title"> Register </span>
           <span className="desc"> Just some details to get you in.! </span>
           <form onSubmit={handleSubmit}>

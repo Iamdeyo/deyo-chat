@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FiMessageSquare, FiMonitor, FiMoon, FiSun } from 'react-icons/fi';
+import Logo from '../assets/logo.svg';
 
 const Navbar = () => {
   const [themeMode, setThemeMode] = useState(
@@ -48,8 +49,7 @@ const Navbar = () => {
     <div className="navBar">
       <div className="logo">
         <span className="icon">
-          <FiMessageSquare size={30} />
-          <span className="D">D</span>
+          <img src={Logo} alt="logo" width={30} height={30} />
         </span>
         <span className="title">Deyo Chat</span>
       </div>
